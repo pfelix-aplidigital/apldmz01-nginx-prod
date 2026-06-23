@@ -1,0 +1,4 @@
+.env
+backups/*.tar.gz
+backups/reports/*.html
+backups/reports/*.xml

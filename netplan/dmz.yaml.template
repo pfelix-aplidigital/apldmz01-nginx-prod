@@ -1,0 +1,23 @@
+# Template netplan para migração à rede DMZ.
+# Variáveis substituídas por envsubst em 09-migrate-network.sh:
+#   DMZ_INTERFACE, DMZ_IP, DMZ_PREFIX, DMZ_GATEWAY, DMZ_DNS_1, DMZ_DNS_2
+
+network:
+  version: 2
+  renderer: networkd
+  ethernets:
+    ${DMZ_INTERFACE}:
+      dhcp4: false
+      dhcp6: false
+      addresses:
+        - ${DMZ_IP}/${DMZ_PREFIX}
+      routes:
+        - to: default
+          via: ${DMZ_GATEWAY}
+          metric: 100
+      nameservers:
+        addresses:
+          - ${DMZ_DNS_1}
+          - ${DMZ_DNS_2}
+        search:
+          - lab.aplidigital.com.br

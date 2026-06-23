@@ -1,0 +1,54 @@
+# Template de virtual host — renderizado via envsubst em deploy-sites.sh / add-site.sh.
+# Variáveis substituídas: SITE_FQDN, UPSTREAM, UPSTREAM_PORT, UPSTREAM_SCHEME, PROXY_SSL_VERIFY
+
+# Redireciona HTTP → HTTPS
+server {
+    listen      80;
+    listen      [::]:80;
+    server_name ${SITE_FQDN};
+
+    # Permite renovação do certbot via HTTP
+    location /.well-known/acme-challenge/ {
+        root /var/www/certbot;
+    }
+
+    location / {
+        return 301 https://$host$request_uri;
+    }
+}
+
+# Virtual host HTTPS
+server {
+    listen      443 ssl;
+    listen      [::]:443 ssl;
+    server_name ${SITE_FQDN};
+
+    # ── TLS ──────────────────────────────────────────────────────────────────
+    ssl_certificate     /etc/letsencrypt/live/${SITE_FQDN}/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/${SITE_FQDN}/privkey.pem;
+    ssl_trusted_certificate /etc/letsencrypt/live/${SITE_FQDN}/chain.pem;
+
+    include /etc/nginx/conf.d/ssl-params.conf;
+
+    # ── Segurança ─────────────────────────────────────────────────────────────
+    include /etc/nginx/conf.d/security-headers.conf;
+
+    # ── Rate limiting ─────────────────────────────────────────────────────────
+    include /etc/nginx/conf.d/ratelimit.conf;
+
+    # ── Logging específico deste site ─────────────────────────────────────────
+    access_log /var/log/nginx/${SITE_FQDN}-access.log main;
+    error_log  /var/log/nginx/${SITE_FQDN}-error.log warn;
+
+    # ── Proxy reverso ─────────────────────────────────────────────────────────
+    location / {
+        include /etc/nginx/snippets/proxy.conf;
+
+        proxy_pass         ${UPSTREAM_SCHEME}://${UPSTREAM}:${UPSTREAM_PORT};
+        proxy_ssl_verify   ${PROXY_SSL_VERIFY};
+
+        # Necessário quando proxy_ssl_verify=off e backend usa SNI
+        proxy_ssl_server_name on;
+        proxy_ssl_name        ${UPSTREAM};
+    }
+}

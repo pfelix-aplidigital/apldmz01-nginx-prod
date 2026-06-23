@@ -1,0 +1,17 @@
+# Definição dos sites publicados pelo reverse proxy.
+# Formato: FQDN|UPSTREAM_IP|UPSTREAM_PORT|UPSTREAM_SCHEME
+# Linhas começando com # são ignoradas.
+#
+# backends 8083/8443 = HTTPS (confirmar esquema real em cada produto Imperva)
+# PROXY_SSL_VERIFY controlado via .env (off=lab, on=produção com CA válida)
+
+auto.lab.aplidigital.com.br|10.50.0.70|443|https
+dam-std.lab.aplidigital.com.br|192.168.255.71|8083|https
+dam-ls.lab.aplidigital.com.br|192.168.255.74|8083|https
+dsf.lab.aplidigital.com.br|192.168.255.77|8443|https
+dsf-gw1.lab.aplidigital.com.br|192.168.255.78|8443|https
+dsf-gw2.lab.aplidigital.com.br|192.168.255.79|8443|https
+dra.lab.aplidigital.com.br|192.168.255.80|8443|https
+waf.lab.aplidigital.com.br|192.168.255.82|8083|https
+ciphertrust.lab.aplidigital.com.br|192.168.255.84|443|https
+ddc.lab.aplidigital.com.br|192.168.255.85|443|https
