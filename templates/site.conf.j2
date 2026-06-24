@@ -33,8 +33,9 @@ server {
     # ── Segurança ─────────────────────────────────────────────────────────────
     include /etc/nginx/conf.d/security-headers.conf;
 
-    # ── Rate limiting ─────────────────────────────────────────────────────────
-    include /etc/nginx/conf.d/ratelimit.conf;
+    # ── Rate limiting (zonas definidas em conf.d/ratelimit.conf via http{}) ───
+    limit_req  zone=general burst=20 nodelay;
+    limit_conn addr 20;
 
     # ── Logging específico deste site ─────────────────────────────────────────
     access_log /var/log/nginx/${SITE_FQDN}-access.log main;
