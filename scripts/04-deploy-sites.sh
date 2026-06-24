@@ -59,7 +59,13 @@ done < "$SITES_LIST"
 
 log_info "Total: $COUNT sites gerados."
 
-log_step "04-deploy-sites: Validando e recarregando NGINX"
-nginx_test_reload
+log_step "04-deploy-sites: Testando configuração NGINX"
+if nginx -t 2>&1; then
+    nginx -s reload
+    log_info "NGINX recarregado com sucesso."
+else
+    log_warn "nginx -t reportou erros (certificados SSL ainda não emitidos?)."
+    log_warn "Execute 'make ssl' para emitir os certs e depois 'make update-config'."
+fi
 
 log_info "04-deploy-sites: Concluído."
