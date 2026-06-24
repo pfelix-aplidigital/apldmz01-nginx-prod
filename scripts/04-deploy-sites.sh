@@ -53,7 +53,7 @@ while IFS='|' read -r fqdn upstream port scheme; do
     ln -sf "$DEST" "$SITES_ENABLED/${fqdn}.conf"
 
     log_info "  ✓ ${fqdn} → ${scheme}://${upstream}:${port}"
-    (( COUNT++ ))
+    (( ++COUNT ))
 
 done < "$SITES_LIST"
 
