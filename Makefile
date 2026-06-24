@@ -92,9 +92,7 @@ install-nginx: ## Instala NGINX (repo oficial) + deploy das configs base
 # ─────────────────────────────────────────────────────────────────────────────
 create-admin: ## Cria usuário apli.adm com chave SSH e sudo
 	@echo ""; echo "══ make create-admin ═════════════════════════════════════"
-	@[[ -n "$(ADMIN_PUBKEY)" ]] || { echo "ERRO: ADMIN_PUBKEY não definido. Defina no .env ou passe como argumento."; exit 1; }
-	@ADMIN_USER=$(ADMIN_USER) ADMIN_PUBKEY='$(ADMIN_PUBKEY)' ADMIN_NOPASSWD=$(ADMIN_NOPASSWD) \
-		bash $(MAKEDIR)scripts/03-create-admin.sh
+	@bash $(MAKEDIR)scripts/03-create-admin.sh
 
 # ─────────────────────────────────────────────────────────────────────────────
 deploy-sites: ## Gera virtual hosts para todos os FQDNs em nginx/sites.list
@@ -110,10 +108,10 @@ ssl: ## Emite/renova certificados Let's Encrypt + configura timer de renovação
 # ─────────────────────────────────────────────────────────────────────────────
 add-site: ## Adiciona novo site (SITE_FQDN= UPSTREAM= UPSTREAM_PORT= UPSTREAM_SCHEME=)
 	@echo ""; echo "══ make add-site ═════════════════════════════════════════"
-	@[[ -n "$(SITE_FQDN)" ]]  || { echo "ERRO: SITE_FQDN não definido.";  exit 1; }
-	@[[ -n "$(UPSTREAM)" ]]   || { echo "ERRO: UPSTREAM não definido.";   exit 1; }
+	@[[ -n "$(SITE_FQDN)" ]] || { echo "ERRO: SITE_FQDN não definido.";  exit 1; }
+	@[[ -n "$(UPSTREAM)" ]]  || { echo "ERRO: UPSTREAM não definido.";   exit 1; }
 	@SITE_FQDN=$(SITE_FQDN) UPSTREAM=$(UPSTREAM) UPSTREAM_PORT=$(UPSTREAM_PORT) \
-		UPSTREAM_SCHEME=$(UPSTREAM_SCHEME) PROXY_SSL_VERIFY=$(PROXY_SSL_VERIFY) \
+		UPSTREAM_SCHEME=$(UPSTREAM_SCHEME) \
 		bash $(MAKEDIR)scripts/add-site.sh
 
 # ─────────────────────────────────────────────────────────────────────────────
