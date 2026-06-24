@@ -19,8 +19,8 @@ server {
 
 # Virtual host HTTPS
 server {
-    listen      443 ssl;
-    listen      [::]:443 ssl;
+    listen      443 ssl http2;
+    listen      [::]:443 ssl http2;
     server_name ${SITE_FQDN};
 
     # ── TLS ──────────────────────────────────────────────────────────────────
@@ -30,12 +30,10 @@ server {
 
     include /etc/nginx/conf.d/ssl-params.conf;
 
-    # ── Segurança ─────────────────────────────────────────────────────────────
+    # ── Segurança (HSTS, X-Content-Type-Options, Referrer-Policy) ─────────────
+    # CSP, X-Frame-Options e XSS-Protection omitidos — backends Imperva gerenciam
+    # seus próprios headers e JS inline é bloqueado por CSP restritiva.
     include /etc/nginx/conf.d/security-headers.conf;
-
-    # ── Rate limiting (zonas definidas em conf.d/ratelimit.conf via http{}) ───
-    limit_req  zone=general burst=20 nodelay;
-    limit_conn addr 20;
 
     # ── Logging específico deste site ─────────────────────────────────────────
     access_log /var/log/nginx/${SITE_FQDN}-access.log main;
@@ -48,8 +46,22 @@ server {
         proxy_pass         ${UPSTREAM_SCHEME}://${UPSTREAM}:${UPSTREAM_PORT};
         proxy_ssl_verify   ${PROXY_SSL_VERIFY};
 
-        # Necessário quando proxy_ssl_verify=off e backend usa SNI
+        # SNI para backend com SSL
         proxy_ssl_server_name on;
         proxy_ssl_name        ${UPSTREAM};
+
+        # WebSocket — consoles Imperva/Thales usam WS para updates em tempo real
+        proxy_set_header Upgrade    $http_upgrade;
+        proxy_set_header Connection $connection_upgrade;
+
+        # Timeouts estendidos para consoles de gerenciamento pesados
+        proxy_connect_timeout 120s;
+        proxy_send_timeout    300s;
+        proxy_read_timeout    300s;
+
+        # Buffers maiores para UIs JavaScript pesadas
+        proxy_buffer_size        16k;
+        proxy_buffers            8 32k;
+        proxy_busy_buffers_size  64k;
     }
 }
