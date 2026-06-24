@@ -150,6 +150,14 @@ Os apps Imperva (SecureSphere DAM, DSF, DRA, WAF, CipherTrust, DDC) têm requisi
 
 O `security-headers.conf` mantém apenas HSTS, `X-Content-Type-Options` e `Referrer-Policy` — headers que não interferem nos apps.
 
+### SSL do backend Imperva AutoC2 (`auto.lab.aplidigital.com.br` → `10.50.0.70:443`)
+
+O console AutoC2 (Imperva Automatic Config Compliance) pode retornar erros de proxy (`502 Bad Gateway`) quando o certificado TLS do próprio backend está expirado ou inválido. O nginx conecta com `proxy_ssl_verify off`, então o erro não é de verificação de cadeia — é o backend encerrando o handshake por problemas no seu próprio certificado.
+
+**Sintoma:** tráfego chega ao nginx (`access.log` registra o request), mas o upstream fecha a conexão antes de responder.
+
+**Resolução:** renovar ou reinstalar o certificado TLS no servidor `10.50.0.70` (console do próprio Imperva AutoC2 ou CLI do produto). Após a renovação, o nginx retoma o proxy sem nenhuma alteração de configuração.
+
 ---
 
 ## Variáveis de configuração
