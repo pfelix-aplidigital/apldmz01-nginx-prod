@@ -41,7 +41,7 @@ UPSTREAM_PORT      ?= 443
 UPSTREAM_SCHEME    ?= https
 
 # ─────────────────────────────────────────────────────────────────────────────
-.PHONY: help all harden install-nginx ssl create-admin deploy-sites \
+.PHONY: help all harden install-nginx ssl ssl-selfsigned create-admin deploy-sites \
         add-site update-config backup check-updates apply-updates \
         migrate-network
 
@@ -104,6 +104,11 @@ ssl: ## Emite/renova certificados Let's Encrypt + configura timer de renovação
 	@echo ""; echo "══ make ssl ══════════════════════════════════════════════"
 	@[[ -n "$(LETSENCRYPT_EMAIL)" ]] || { echo "ERRO: LETSENCRYPT_EMAIL não definido."; exit 1; }
 	@bash $(MAKEDIR)scripts/05-ssl.sh
+
+# ─────────────────────────────────────────────────────────────────────────────
+ssl-selfsigned: ## Gera CA local + certs autoassinados (para lab/rede interna sem acesso LE)
+	@echo ""; echo "══ make ssl-selfsigned ═══════════════════════════════════"
+	@bash $(MAKEDIR)scripts/05-ssl-selfsigned.sh
 
 # ─────────────────────────────────────────────────────────────────────────────
 add-site: ## Adiciona novo site (SITE_FQDN= UPSTREAM= UPSTREAM_PORT= UPSTREAM_SCHEME=)
