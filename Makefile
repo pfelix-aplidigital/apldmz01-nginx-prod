@@ -72,9 +72,10 @@ help: ## Lista todos os targets disponíveis
 	@echo ""
 
 # ─────────────────────────────────────────────────────────────────────────────
-all: harden install-nginx create-admin deploy-sites ssl backup ## Executa tudo na ordem segura (exceto migrate-network)
+all: install-nginx create-admin harden deploy-sites ssl backup ## Executa tudo na ordem segura (exceto migrate-network)
 	@echo ""
 	@echo "  ✓ Provisionamento completo. Verifique os logs acima."
+	@echo "  → SSH agora somente via apli.adm: ssh apli.adm@<IP>"
 	@echo "  → Último passo (muda rede, derruba SSH): sudo make migrate-network"
 
 # ─────────────────────────────────────────────────────────────────────────────
